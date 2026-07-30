@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Whisker</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Lora:wght@500;600;700&display=swap"
+    rel="stylesheet"
+  />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark"></span>
+      <h1 class="brand-title">Whisker</h1>
+    </div>
+    <div class="session-info">
+      <span id="session-date" class="session-date"></span>
+      <button id="export-btn" class="btn btn-ghost" type="button" aria-label="Export">
+        <svg viewBox="0 0 20 20" width="14" height="14" aria-hidden="true" style="margin-right:6px;vertical-align:-2px;">
+          <path d="M10 3v10m0 0l-4-4m4 4l4-4M4 15v2h12v-2" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Export
+      </button>
+    </div>
+  </header>
+
+  <main class="layout">
+    <section class="panel chat-panel" aria-label="Assistant chat">
+      <div class="panel-head">
+        <h2 class="panel-title">Assistant</h2>
+      </div>
+      <div class="chat-log" id="chat-log" aria-live="polite">
+        <div class="chat-message agent">
+          <div class="agent-markdown">
+            <p>Hey, I'm here to help you recall who you met today. Ask me anything about your day.</p>
+          </div>
+        </div>
+      </div>
+      <form class="chat-input" id="chat-form" autocomplete="off">
+        <input
+          id="chat-field"
+          type="text"
+          placeholder="Ask about your day..."
+          aria-label="Message"
+          required
+        />
+        <button type="submit" class="btn btn-primary" aria-label="Send">
+          <svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true">
+            <path d="M3 10l14-7-4 14-3-5-7-2z" fill="currentColor" />
+          </svg>
+        </button>
+      </form>
+    </section>
+
+    <section class="panel summary-panel" aria-label="Today's summary">
+      <div class="panel-head">
+        <h2 class="panel-title">Today's summary</h2>
+        <button id="regenerate-btn" class="btn btn-ghost" disabled>Regenerate</button>
+      </div>
+
+      <div class="summary-body" id="summary">
+        <p class="summary-empty">
+          Run a session to generate a summary of conversations and action items.
+        </p>
+      </div>
+
+      <div class="panel-sub people-sub">
+        <div class="sub-head">
+          <h3 class="sub-title">People today</h3>
+          <span class="count-pill" id="people-count">0</span>
+        </div>
+        <ul class="people-list" id="people-list">
+          <li class="empty-state">No one yet.</li>
+        </ul>
+      </div>
+
+      <div class="panel-sub">
+        <h3 class="sub-title">Action items</h3>
+        <ul class="action-list" id="action-list">
+          <li class="empty-state">None yet.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="panel clips-panel" aria-label="Relevant video clips">
+      <div class="panel-head">
+        <h2 class="panel-title">Relevant clips</h2>
+        <span class="clips-meta" id="clips-meta">0 clips</span>
+      </div>
+      <div class="clips-list" id="clips-list">
+        <div class="clips-empty">
+          <div class="clips-empty-inner">
+            <p class="clips-empty-title">No clips yet</p>
+            <p class="clips-empty-sub">Processed clips will appear here once available.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="graph.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
