@@ -10,6 +10,7 @@ window.
 |---|---|
 | `s3_av_recorder.ino` | boot, shared epoch `t0`, task launch, health log |
 | `config.h` | **the only file you should need to edit** |
+| `camera_pins.h` | DVP pin map for the Sense board — self-contained, no download needed |
 | `avi_writer.{h,cpp}` | RIFF/AVI MJPEG muxer — headers, `movi`, `idx1` |
 | `video_capture.{h,cpp}` | camera init + clip task (core 1) |
 | `audio_capture.{h,cpp}` | PDM I2S init + WAV clip task (core 0) |
@@ -21,10 +22,39 @@ Keep them all in a folder named `s3_av_recorder/` so the IDE loads them as tabs.
 ## Build settings
 
 - **Board:** XIAO_ESP32S3 (not generic ESP32S3 Dev Module)
-- **PSRAM: OPI PSRAM — enabled.** Non-negotiable; the camera won't init without it
+- **PSRAM: OPI PSRAM.** The board default in `boards.txt` is *Disabled*, so this
+  is off unless you set it. The sketch runs either way, but see below
 - **USB CDC On Boot: Enabled**, or you see no serial output
 - **Arduino-ESP32 core 3.x** — the audio path uses the ESP-IDF 5 `i2s_pdm.h` API
 - microSD ≤ 32 GB, formatted **FAT32**
+
+## PSRAM: works without it, but costs you
+
+`XIAO_ESP32S3.menu.PSRAM.disabled` is the first entry in the core's `boards.txt`,
+which makes it the default. The onboard 8 MB is therefore unused until you pick
+**Tools > PSRAM > OPI PSRAM**.
+
+The sketch detects this and falls back instead of refusing to start:
+
+| | PSRAM on | PSRAM off |
+|---|---|---|
+| framebuffer location | PSRAM | internal DRAM |
+| `fb_count` | 2 | 1 |
+| `grab_mode` | `GRAB_LATEST` | `GRAB_WHEN_EMPTY` |
+| `idx1` table | 600 frames | 200 frames |
+| expected fps @ VGA | ~20–25 | ~8–12 |
+
+The frame rate roughly halves because with a single framebuffer the sensor
+cannot expose frame N+1 while frame N is being written to the card — capture and
+SD write serialise instead of overlapping. In JPEG mode the driver sizes each
+framebuffer at `width * height / 5`, so VGA costs 60 KB of internal DRAM and only
+one fits alongside the SD buffers, audio DMA and task stacks.
+
+If init still runs out of memory, `video_begin()` steps the resolution down
+(VGA → QVGA → QQVGA), calling `esp_camera_deinit()` between attempts, and logs
+the resolution it actually achieved. Recording is not affected by any of this
+beyond frame rate: the AVI header is written from measured timing, so a 10 fps
+clip plays back correctly at 10 fps.
 
 ## Why not the wiki's video sketch
 
@@ -54,6 +84,34 @@ placeholders, and `avi_close()` seeks back and patches them from the actual
 frame count and wall-clock span. `dwScale = elapsed_ms`, `dwRate = frames*1000`
 gives the exact ratio with no rounding. That's the difference between a clip
 that plays at real speed and one that plays at whatever the player invents.
+
+## Running headless / on battery
+
+No serial host is required, and nothing waits for one.
+
+The trap this avoids: with **USB CDC On Boot** enabled, `Serial` is the native
+USB peripheral, not a UART. With no host attached its TX buffer fills and never
+drains, so `Serial.printf()` blocks forever. The board then works perfectly over
+USB and appears dead on a battery. `Serial.setTxTimeoutMs(0)` in
+`serial_begin_nonblocking()` makes those writes discard instead of block.
+
+Also changed for unattended use:
+
+- **Nothing halts.** Init failures back off and `ESP.restart()` instead of
+  spinning forever — a halted board is indistinguishable from a dead one with no
+  serial attached, and would not recover from a card that was merely slow.
+- **Each subsystem is retried `INIT_RETRIES` times** with escalating delay, and
+  `POWER_SETTLE_MS` runs before the first attempt. External supplies ramp 3V3
+  more slowly than USB, so a first-attempt camera or SD failure is common.
+- **Stall watchdog.** If no clip is written for `STALL_REBOOT_PERIODS` × 30 s,
+  the board restarts itself. Set to 0 to disable.
+- **The card is wiped only on a true power-on** (`ESP_RST_POWERON`). A
+  self-restart keeps existing recordings and resumes numbering one past the
+  highest clip on the card, so recovery never destroys or overwrites a session.
+
+Without serial, the **orange LED is your status light**: SD chip-select shares
+GPIO21 with it, so it flickers on every card write. Steady flickering means
+clips are being written. Dark means the recorder is not running.
 
 ## Data format
 

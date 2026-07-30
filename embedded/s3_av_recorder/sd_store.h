@@ -17,3 +17,7 @@ void sd_log_event(const char *kind, uint32_t index, uint32_t rel_ms,
                   uint32_t bytes, uint32_t frames, uint32_t millifps);
 
 uint64_t sd_free_bytes();
+
+/* First clip index for this session. 0 on a cold boot; after a self-restart,
+   one past the highest clip already on the card, so nothing is overwritten. */
+uint32_t sd_session_base();

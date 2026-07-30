@@ -52,6 +52,19 @@
 #define MIC_PIN_DATA           41
 
 /* =========================================================================
+ *  HEADLESS / EXTERNAL POWER
+ *
+ *  POWER_SETTLE_MS   pause before touching camera/SD so the 3V3 rail can
+ *                    stabilise. Battery and weak adapters ramp slower than USB.
+ *  INIT_RETRIES      attempts per subsystem before rebooting and retrying.
+ *  STALL_REBOOT_PERIODS  consecutive 30 s health checks with no new clip
+ *                    before self-restarting. 0 disables the stall watchdog.
+ * ========================================================================= */
+#define POWER_SETTLE_MS        250
+#define INIT_RETRIES           3
+#define STALL_REBOOT_PERIODS   3      /* 3 * 30 s = 90 s without a clip */
+
+/* =========================================================================
  *  STORAGE
  *  microSD on the Sense expansion board is SPI, CS on GPIO21.
  *  Card must be <=32 GB and formatted FAT32.

@@ -15,6 +15,10 @@ uint32_t video_clips_saved()  { return s_clips; }
 uint32_t video_last_millifps(){ return s_millifps; }
 
 bool video_begin() {
+  /* init_retry() may call this again after a failure. Release anything a
+     partial init left behind, or the retry starts with less heap. */
+  esp_camera_deinit();
+
   camera_config_t c = {};
   c.ledc_channel = LEDC_CHANNEL_0;
   c.ledc_timer   = LEDC_TIMER_0;
@@ -106,12 +110,13 @@ bool video_begin() {
 }
 
 static void video_task(void *) {
-  uint32_t clip = 0;
+  uint32_t clip = sd_session_base();   /* 0 cold, else past existing clips */
 
   for (;;) {
     /* Absolute deadlines derived from t0 so clip boundaries never drift,
        which is what keeps video/NNNNN.avi aligned with audio/NNNNN.wav. */
-    uint32_t clip_start_ms = s_t0 + clip * CLIP_MS;
+    uint32_t seq = clip - sd_session_base();   /* 0-based within this session */
+    uint32_t clip_start_ms = s_t0 + seq * CLIP_MS;
     uint32_t clip_end_ms   = clip_start_ms + CLIP_MS;
 
     while ((int32_t)(millis() - clip_start_ms) < 0) vTaskDelay(1);

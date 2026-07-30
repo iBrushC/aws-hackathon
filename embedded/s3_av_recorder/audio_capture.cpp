@@ -34,7 +34,14 @@ static void condition(uint8_t *buf, size_t bytes) {
 }
 
 bool audio_begin() {
-  s_buf = (uint8_t *)malloc(AUDIO_CHUNK_BYTES);
+  /* Idempotent: init_retry() may call this more than once. Re-allocating the
+     buffer or re-creating the I2S channel would leak and then fail. */
+  if (s_rx) {
+    i2s_channel_disable(s_rx);
+    i2s_del_channel(s_rx);
+    s_rx = nullptr;
+  }
+  if (!s_buf) s_buf = (uint8_t *)malloc(AUDIO_CHUNK_BYTES);
   if (!s_buf) return false;
 
   i2s_chan_config_t ch = I2S_CHANNEL_DEFAULT_CONFIG(I2S_NUM_0, I2S_ROLE_MASTER);
@@ -61,7 +68,7 @@ bool audio_begin() {
 }
 
 static void audio_task(void *) {
-  uint32_t clip = 0;
+  uint32_t clip = sd_session_base();
   uint8_t header[WAV_HEADER_BYTES];
 
   for (;;) {
