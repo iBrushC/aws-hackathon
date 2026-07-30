@@ -1,0 +1,401 @@
+{
+  "audioContext": [
+    {
+      "description": "Throughout the video, ambient hackathon/coworking-room noise is present: overlapping conversations, keyboard typing, footsteps, and room movement.",
+      "endSec": 1119,
+      "startSec": 0
+    },
+    {
+      "description": "Most of the audio is conversational interview-style speech between the camera holder and participants.",
+      "endSec": 1119,
+      "startSec": 0
+    },
+    {
+      "description": "No clear music track is evidenced in the retrieved segments; non-speech audio is mainly room ambience.",
+      "endSec": 1119,
+      "startSec": 0
+    }
+  ],
+  "keyMoments": [
+    {
+      "description": "Interview with Bryan begins; he says he is working on a multimedia knowledge base for marketing.",
+      "endSec": 16,
+      "modalities": [
+        "visual",
+        "audio",
+        "speech",
+        "text"
+      ],
+      "startSec": 0
+    },
+    {
+      "description": "Longer conversation with Bryan about his project/company and target audience.",
+      "endSec": 92,
+      "modalities": [
+        "visual",
+        "audio",
+        "speech"
+      ],
+      "startSec": 16
+    },
+    {
+      "description": "Camera pans across the room, showing attendees working at tables with laptops.",
+      "endSec": 115,
+      "modalities": [
+        "visual",
+        "audio"
+      ],
+      "startSec": 92
+    },
+    {
+      "description": "Interview with Andrew Knox starts; the interviewer explains the idea of a video-based note-taker for remembering names/faces at conferences.",
+      "endSec": 142,
+      "modalities": [
+        "visual",
+        "audio",
+        "speech"
+      ],
+      "startSec": 115
+    },
+    {
+      "description": "Andrew Knox discusses creating videos for CMOs from other people's videos and related tooling ideas.",
+      "endSec": 262,
+      "modalities": [
+        "visual",
+        "audio",
+        "speech"
+      ],
+      "startSec": 142
+    },
+    {
+      "description": "General room sweep with people working, a large screen, and laptop/code views.",
+      "endSec": 301,
+      "modalities": [
+        "visual",
+        "audio"
+      ],
+      "startSec": 262
+    },
+    {
+      "description": "Conversation with an Andrew/unknown male participant about smart glasses, AWS/agent tooling, and related projects.",
+      "endSec": 546,
+      "modalities": [
+        "visual",
+        "audio",
+        "speech"
+      ],
+      "startSec": 301
+    },
+    {
+      "description": "A woman with long dark hair briefly appears smiling/talking, then the camera returns to the standing speaker.",
+      "endSec": 559,
+      "modalities": [
+        "visual",
+        "audio",
+        "speech"
+      ],
+      "startSec": 533
+    },
+    {
+      "description": "A bald man with glasses and beard, wearing a ghost-logo shirt and holding a mug, explains a camera-feed/AWS agent project.",
+      "endSec": 668,
+      "modalities": [
+        "visual",
+        "audio",
+        "speech"
+      ],
+      "startSec": 559
+    },
+    {
+      "description": "The same speaker describes a GPS/photo-based agent, Wikipedia lookups, persona modes, and app plans.",
+      "endSec": 742,
+      "modalities": [
+        "visual",
+        "audio",
+        "speech"
+      ],
+      "startSec": 668
+    },
+    {
+      "description": "He shifts into personal background/networking talk: Cornell, sponsorships, community-building, upcoming demo.",
+      "endSec": 816,
+      "modalities": [
+        "visual",
+        "audio",
+        "speech"
+      ],
+      "startSec": 742
+    },
+    {
+      "description": "Camera moves to another table; Alton introduces himself and says he is testing Twelve Labs.",
+      "endSec": 839,
+      "modalities": [
+        "visual",
+        "audio",
+        "speech",
+        "text"
+      ],
+      "startSec": 816
+    },
+    {
+      "description": "Extended discussion at Alton's table about project ideas including user-generated content and differentiating between people.",
+      "endSec": 975,
+      "modalities": [
+        "visual",
+        "audio",
+        "speech"
+      ],
+      "startSec": 839
+    },
+    {
+      "description": "Whip-pan transition to a different group.",
+      "endSec": 984,
+      "modalities": [
+        "visual",
+        "audio"
+      ],
+      "startSec": 975
+    },
+    {
+      "description": "Final group: a man with glasses explains a project involving parsing footage/security-camera-style video data while others work on laptops.",
+      "endSec": 1119,
+      "modalities": [
+        "visual",
+        "audio",
+        "speech"
+      ],
+      "startSec": 984
+    }
+  ],
+  "onScreenText": [
+    {
+      "endSec": 6,
+      "startSec": 2,
+      "text": "EXIT sign"
+    },
+    {
+      "endSec": 30,
+      "startSec": 13,
+      "text": "Bryan on a visible name tag"
+    },
+    {
+      "endSec": 840,
+      "startSec": 815,
+      "text": "AWS logo on wall"
+    },
+    {
+      "endSec": 840,
+      "startSec": 815,
+      "text": "AWS Builder on lanyard"
+    },
+    {
+      "endSec": 840,
+      "startSec": 815,
+      "text": "Smart on water bottle"
+    }
+  ],
+  "people": [
+    {
+      "evidence": "Explicitly says 'Bryan'; metadata aliases include 'Bryan' and 'the man in the grey shirt'.",
+      "name": "Bryan",
+      "role": "Interviewed participant; says he is working on a multimedia knowledge base for marketing"
+    },
+    {
+      "evidence": "Explicitly says 'Andrew Knox'; metadata contains entity 'Andrew Knox'.",
+      "name": "Andrew Knox",
+      "role": "Interviewed participant discussing video creation for CMOs and tooling ideas"
+    },
+    {
+      "evidence": "Metadata contains entity 'Andrew' / 'Man with Glasses'; shot summaries describe Andrew speaking from about 301s onward.",
+      "name": "Andrew",
+      "role": "Participant discussing smart glasses, AWS/agent work, Cornell, and networking"
+    },
+    {
+      "evidence": "Explicitly introduced by name in later segment; metadata contains entity 'Alton'.",
+      "name": "Alton",
+      "role": "Participant at a table, testing Twelve Labs"
+    },
+    {
+      "evidence": "Shot summaries and VLM output describe a bald man with glasses/beard in a ghost-logo shirt holding a mug, but no explicit supported name in retrieved evidence.",
+      "name": "Unknown",
+      "role": "Standing participant explaining an AWS/camera-feed agent project; identifiable visual evidence: bald, glasses, beard, black ghost-logo shirt, mug"
+    },
+    {
+      "evidence": "Metadata entity and shot summary mention 'the woman with long dark hair'; no explicit spoken name retrieved.",
+      "name": "Unknown",
+      "role": "Woman with long dark hair, briefly on camera and seated near Alton's table"
+    },
+    {
+      "evidence": "The camera holder/interviewer speaks throughout but no explicit name is supported in retrieved evidence.",
+      "name": "Unknown",
+      "role": "Off-camera interviewer / camera holder"
+    }
+  ],
+  "speech": [
+    {
+      "endSec": 9,
+      "speaker": "Unknown interviewer",
+      "startSec": 3,
+      "text": "What's your name?"
+    },
+    {
+      "endSec": 9,
+      "speaker": "Bryan",
+      "startSec": 8,
+      "text": "Bryan."
+    },
+    {
+      "endSec": 16,
+      "speaker": "Bryan",
+      "startSec": 12,
+      "text": "I am working on a multimedia knowledge base for marketing."
+    },
+    {
+      "endSec": 142,
+      "speaker": "Unknown interviewer",
+      "startSec": 115,
+      "text": "Explains they are recording data for a demo and trying to create a video-based pocket note-taker for remembering names and faces at conferences."
+    },
+    {
+      "endSec": 142,
+      "speaker": "Andrew Knox",
+      "startSec": 140,
+      "text": "Andrew Knox."
+    },
+    {
+      "endSec": 262,
+      "speaker": "Andrew Knox",
+      "startSec": 142,
+      "text": "Discusses creating videos for CMOs using other people's videos, reference-video sourcing, and adjacent tooling ideas."
+    },
+    {
+      "endSec": 392,
+      "speaker": "Andrew",
+      "startSec": 316,
+      "text": "Discusses Ray-Ban smart glasses, possible medical applications, and work connected to AWS/agent courses, Bedrock, and Strands."
+    },
+    {
+      "endSec": 444,
+      "speaker": "Unknown interviewer",
+      "startSec": 412,
+      "text": "Explains an AI assistant that streams audio conversations to the cloud and summarizes meetings, action items, and research."
+    },
+    {
+      "endSec": 495,
+      "speaker": "Andrew",
+      "startSec": 444,
+      "text": "Responds that the idea is similar to work discussed in the VC space and asks about note-taker tools like Granola."
+    },
+    {
+      "endSec": 533,
+      "speaker": "Unknown interviewer",
+      "startSec": 495,
+      "text": "Says they build their own developer tooling and mentions building an early server on AWS."
+    },
+    {
+      "endSec": 668,
+      "speaker": "Unknown",
+      "startSec": 559,
+      "text": "Explains a project that takes camera feed into an AWS agent and uses a local vector database for fast retrieval."
+    },
+    {
+      "endSec": 742,
+      "speaker": "Unknown",
+      "startSec": 668,
+      "text": "Describes sending GPS coordinates and pictures to an agent for location-based information and Wikipedia lookups, with persona modes."
+    },
+    {
+      "endSec": 816,
+      "speaker": "Unknown",
+      "startSec": 742,
+      "text": "Talks about turning the project into a full app, demo plans, being at Cornell, networking, sponsorships, and building a hacker community."
+    },
+    {
+      "endSec": 839,
+      "speaker": "Alton",
+      "startSec": 816,
+      "text": "Introduces himself and says he is testing Twelve Labs."
+    },
+    {
+      "endSec": 975,
+      "speaker": "Alton",
+      "startSec": 839,
+      "text": "Discusses project ideas including user-generated content and differentiating between people."
+    },
+    {
+      "endSec": 1119,
+      "speaker": "Unknown man with glasses",
+      "startSec": 984,
+      "text": "Explains a project involving parsing footage/security-camera-style video data while teammates work nearby."
+    }
+  ],
+  "summary": "An 18.5-minute handheld walkthrough/interview video from a hackathon or tech coworking event. The camera holder moves between participants, asking what they are building. Visually, it alternates between close-up interviews and room sweeps showing tables, laptops, large screens, windows, and attendees working. Audio is dominated by live conversation with constant ambient room noise. Spoken topics center on AI agents, multimedia knowledge graphs, video generation, smart glasses, AWS tooling, local vector databases, GPS/photo-based assistants, community-building, and testing Twelve Labs. On-screen text is sparse but includes an EXIT sign, some visible name tags, an AWS logo, an AWS Builder lanyard, and a Smart water bottle label.",
+  "topics": [
+    "hackathon / demo recording",
+    "AI agents",
+    "multimedia knowledge graph",
+    "marketing tools",
+    "video generation for CMOs",
+    "conference memory / note-taking",
+    "smart glasses",
+    "AWS / Bedrock / Strands",
+    "local vector databases",
+    "GPS and image-based assistants",
+    "networking and hacker community",
+    "Twelve Labs testing",
+    "user-generated content analysis",
+    "video parsing / security-camera footage"
+  ],
+  "visualContext": [
+    {
+      "description": "Shaky handheld opening in a busy office/coworking space; camera approaches Bryan near an exit area while others work at tables.",
+      "endSec": 92,
+      "startSec": 0
+    },
+    {
+      "description": "Pan across the room reveals multiple attendees with laptops in an open-plan hackathon setting.",
+      "endSec": 115,
+      "startSec": 92
+    },
+    {
+      "description": "Camera focuses on Andrew Knox, a man with curly blond hair in a black t-shirt, for an interview.",
+      "endSec": 262,
+      "startSec": 115
+    },
+    {
+      "description": "General environment shots: tables, laptop screens with code, a woman typing, and a large blue display/screen.",
+      "endSec": 301,
+      "startSec": 262
+    },
+    {
+      "description": "Medium close-up conversation with Andrew/another male participant about smart glasses and AWS-related work.",
+      "endSec": 546,
+      "startSec": 301
+    },
+    {
+      "description": "Brief cut to a woman with long dark hair smiling/talking.",
+      "endSec": 559,
+      "startSec": 533
+    },
+    {
+      "description": "Standing bald man with glasses and beard in a black ghost-logo shirt speaks while holding a patterned mug; large windows and office fixtures behind him.",
+      "endSec": 816,
+      "startSec": 559
+    },
+    {
+      "description": "Camera moves to another table with Alton, another man, and a woman with long dark hair seated together.",
+      "endSec": 975,
+      "startSec": 816
+    },
+    {
+      "description": "Fast whip-pan transition across the room.",
+      "endSec": 984,
+      "startSec": 975
+    },
+    {
+      "description": "Final group of three men around laptops; one standing man with glasses explains a video-parsing project.",
+      "endSec": 1119,
+      "startSec": 984
+    }
+  ]
+}
