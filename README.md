@@ -110,15 +110,15 @@ flowchart LR
 
 ### Technology Responsibilities
 
-| Technology | Responsibility |
-| --- | --- |
-| TwelveLabs | Multimodal video understanding, entity and topic extraction, timestamp discovery, and corpus-level video reasoning |
-| Strands Agents | Ingestion, polling, extraction, reasoning, validation, and database-write orchestration |
-| OpenAI GPT-5.6 | Data normalization, entity resolution, profile creation, tool calls, and user-query interpretation |
-| Amazon Bedrock | GPT-5.6 inference using AWS credits and AWS-managed infrastructure |
-| AWS | S3 media storage, backend services, observability, and application hosting |
-| Neo4j Aura | Context graph storage and relationship discovery |
-| Web application | Person and topic search, profiles, graph visualization, and evidence playback |
+| Technology      | Responsibility                                                                                                     |
+| --------------- | ------------------------------------------------------------------------------------------------------------------ |
+| TwelveLabs      | Multimodal video understanding, entity and topic extraction, timestamp discovery, and corpus-level video reasoning |
+| Strands Agents  | Ingestion, polling, extraction, reasoning, validation, and database-write orchestration                            |
+| OpenAI GPT-5.6  | Data normalization, entity resolution, profile creation, tool calls, and user-query interpretation                 |
+| Amazon Bedrock  | GPT-5.6 inference using AWS credits and AWS-managed infrastructure                                                 |
+| AWS             | S3 media storage, backend services, observability, and application hosting                                         |
+| Neo4j Aura      | Context graph storage and relationship discovery                                                                   |
+| Web application | Person and topic search, profiles, graph visualization, and evidence playback                                      |
 
 TwelveLabs' workflow is to create an asset, wait until it is ready, add it to a
 knowledge store, wait for indexing, and query the Responses API. Its structured
@@ -332,3 +332,40 @@ flow in the
 into a living professional knowledge network, allowing users to discover not
 only what was said, but who said it, where the evidence is, and how people and
 ideas are connected.
+
+## TwelveLabs Multimodal Context Demo
+
+The included Python script uploads an example video, waits for TwelveLabs to
+process it, adds it to a knowledge store, and prints structured context derived
+from visual scenes, audio, speech, and on-screen text.
+
+### Setup
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install -r requirements.txt
+cp .env.example .env
+```
+
+Add your TwelveLabs API key to `.env`:
+
+```dotenv
+TWELVELABS_API_KEY=your_api_key
+```
+
+### Run with a Local Example Video
+
+```bash
+.venv/bin/python scripts/twelvelabs_context.py \
+  --video /absolute/path/to/example-video.mp4
+```
+
+### Run with a Public Video URL
+
+```bash
+.venv/bin/python scripts/twelvelabs_context.py \
+  --url "https://example.com/example-video.mp4"
+```
+
+The structured result is printed in the terminal and saved under `outputs/`.
