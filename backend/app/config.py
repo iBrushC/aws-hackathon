@@ -49,6 +49,15 @@ class Settings(BaseSettings):
     analysis_window_sec: int = 300
     analysis_max_tokens: int = 4096            # hard API ceiling for this model
     analysis_concurrency: int = 3              # windows analyzed in parallel
+
+    # --- Large file upload --------------------------------------------------
+    # tasks.create posts the whole file in a single request, which is a poor bet
+    # for multi-gigabyte captures: one dropped connection loses the entire
+    # transfer. Files at or above this size are cut into parts and uploaded a
+    # part at a time, with per-part retries, so a failure costs one part.
+    multipart_threshold_mb: int = 200
+    upload_chunk_workers: int = 5              # parts uploaded in parallel
+    index_timeout_sec: int = 3600
     # Neo4j vector index dimension — must match the embed model. The ingest
     # script discovers the true dimension from the first embedding and creates
     # the index accordingly; this is only the default/hint.

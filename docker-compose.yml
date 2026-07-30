@@ -1,6 +1,10 @@
 services:
   neo4j:
     image: neo4j:5.26.0
+    # The graph is meant to outlive any one working session — come back up on
+    # its own after a Docker Desktop or machine restart. The data itself lives
+    # in the neo4j_data volume below and survives container removal either way.
+    restart: unless-stopped
     ports:
       - "7474:7474"
       - "7687:7687"

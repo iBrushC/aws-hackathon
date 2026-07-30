@@ -14,6 +14,8 @@ Response objects are fern-generated pydantic models; we navigate them with
 from __future__ import annotations
 
 import logging
+import os
+import time
 from functools import lru_cache
 from typing import Any
 
@@ -139,15 +141,81 @@ def ensure_index() -> str:
 # Ingest (upload + index a video)
 # ---------------------------------------------------------------------------
 
+def upload_in_parts(index_id: str, video_file: str, on_update=None) -> dict:
+    """Upload a large local video part by part, then index it.
+
+    The multipart uploader splits the file, pushes the parts in parallel and
+    retries them individually, so a dropped connection costs one part instead of
+    a multi-gigabyte transfer. It also registers the file as an *asset*; the
+    asset then has to be attached to the index explicitly, which the one-shot
+    ``tasks.create`` path does for us.
+
+    Returns the same shape as :func:`ingest_video`.
+    """
+    client = get_client()
+    name = os.path.basename(video_file)
+    size_mb = os.path.getsize(video_file) / 1e6
+
+    reported = {"pct": -100.0}
+
+    def _progress(p):
+        pct = float(getattr(p, "percentage", 0.0) or 0.0)
+        if pct - reported["pct"] < 10.0:
+            return
+        reported["pct"] = pct
+        done = getattr(p, "completed_chunks", "?")
+        total = getattr(p, "total_chunks", "?")
+        logger.info("  upload %.0f%% (%s/%s parts)", pct, done, total)
+        if on_update:
+            on_update(f"uploading {pct:.0f}% ({done}/{total} parts)")
+
+    logger.info("Uploading %s (%.0f MB) in parts ...", name, size_mb)
+    result = client.multipart_upload.upload_file(
+        video_file,
+        filename=name,
+        file_type="video",
+        max_workers=settings.upload_chunk_workers,
+        max_retries=3,
+        progress_callback=_progress,
+    )
+    asset_id = str(_getattr_any(result, "asset_id", "id"))
+    logger.info("Uploaded as asset %s — attaching to index %s", asset_id, index_id)
+
+    created = client.indexes.indexed_assets.create(index_id, asset_id=asset_id)
+    indexed_id = str(_getattr_any(created, "id", "_id") or asset_id)
+
+    deadline = time.time() + settings.index_timeout_sec
+    while time.time() < deadline:
+        detail = _dump(client.indexes.indexed_assets.retrieve(index_id, indexed_id))
+        status = detail.get("status") if isinstance(detail, dict) else None
+        if on_update:
+            on_update(status)
+        if status == "ready":
+            sm = (detail.get("system_metadata") or {}) if isinstance(detail, dict) else {}
+            return {
+                "task_id": None,
+                "video_id": asset_id,
+                "status": status,
+                "duration_sec": sm.get("duration"),
+                "filename": sm.get("filename") or name,
+            }
+        if status == "failed":
+            raise RuntimeError(f"TwelveLabs failed to index {name}")
+        time.sleep(5.0)
+    raise TimeoutError(f"Indexing {name} exceeded {settings.index_timeout_sec}s")
+
+
 def ingest_video(index_id: str, *, video_url: str | None = None,
                  video_file: str | None = None, on_update=None) -> dict:
     """Index a video from a public URL or a local file, blocking until done.
 
-    Exactly one of ``video_url`` / ``video_file`` must be given. Returns
+    Exactly one of ``video_url`` / ``video_file`` must be given. Local files at
+    or above ``multipart_threshold_mb`` are uploaded in parts. Returns
     {video_id, status, duration_sec, filename}.
     """
-    import os
     client = get_client()
+    if video_file and os.path.getsize(video_file) >= settings.multipart_threshold_mb * 1_000_000:
+        return upload_in_parts(index_id, video_file, on_update=on_update)
     if video_file:
         with open(video_file, "rb") as fh:
             task = client.tasks.create(

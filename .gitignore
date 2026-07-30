@@ -28,3 +28,5 @@ Thumbs.db
 # Data
 data/documents/*.json
 data/documents/*.txt
+# Graph snapshots — large (segment embeddings) and reproducible from the graph.
+data/snapshots/

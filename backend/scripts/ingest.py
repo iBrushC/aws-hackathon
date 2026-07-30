@@ -145,6 +145,11 @@ def _windows(duration_sec) -> list[tuple[float, float] | None]:
         total = float(duration_sec)
     except (TypeError, ValueError):
         return [None]
+    # TwelveLabs rejects an end_time at its own idea of the duration, and that
+    # value disagrees with the metadata's in the last decimal place depending on
+    # where the metadata came from. Half a second of headroom costs nothing and
+    # avoids a 400 that would silently drop the tail of the video.
+    total = max(0.0, total - 0.5)
     if total <= size:
         return [None]
     out: list[tuple[float, float] | None] = []
@@ -211,6 +216,11 @@ async def analyze_and_structure(video_id: str, duration_sec) -> dict:
         return out
 
     results = await asyncio.gather(*(one(w) for w in windows))
+    if any(not r.get("segments") for r in results):
+        # A dropped window leaves a hole in the timeline; the run would
+        # otherwise look successful, just quietly missing part of the video.
+        log.error("%d of %d windows produced nothing — the graph will have gaps",
+                  sum(1 for r in results if not r.get("segments")), len(windows))
     segments = _merge_segments([r.get("segments", []) for r in results])
     summary = await asyncio.to_thread(
         fuse_summaries, [r.get("video_summary", "") for r in results]

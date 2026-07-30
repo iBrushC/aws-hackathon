@@ -146,11 +146,53 @@ function extractNodesAndRels(results: Record<string, unknown>[]): InternalGraphD
   };
 }
 
+function mergeGraphs(
+  base: InternalGraphData | null,
+  incoming: InternalGraphData,
+): InternalGraphData {
+  if (!base) return incoming;
+  const nodes = new Map(base.nodes.map((n) => [n.id, n]));
+  for (const n of incoming.nodes) nodes.set(n.id, n);
+  const relationships = new Map(base.relationships.map((r) => [r.id, r]));
+  for (const r of incoming.relationships) relationships.set(r.id, r);
+  return {
+    nodes: Array.from(nodes.values()),
+    relationships: Array.from(relationships.values()),
+  };
+}
+
 function getNodeColor(labels: string[]): string {
   for (const label of labels) {
     if (NODE_COLORS[label]) return NODE_COLORS[label];
   }
   return "#6366f1";
+}
+
+function formatTimecode(seconds: number): string {
+  const s = Math.max(0, Math.round(seconds));
+  return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
+}
+
+function getNodeCaption(node: GraphNode): string {
+  const named = (node.properties.name ?? node.properties.title) as string | undefined;
+  if (named) return named;
+
+  // A Segment has no name or title — its identity is when it happens and what
+  // is on screen. Without this every segment in the graph reads "Segment", which
+  // makes a graph of video content look like a diagram of the data model.
+  if (node.labels.includes("Segment")) {
+    const start = node.properties.start_sec as number | undefined;
+    const end = node.properties.end_sec as number | undefined;
+    const range =
+      typeof start === "number" && typeof end === "number"
+        ? `${formatTimecode(start)}–${formatTimecode(end)}`
+        : "";
+    const summary = ((node.properties.summary as string) ?? "").trim();
+    const gist = summary.length > 60 ? `${summary.slice(0, 57)}…` : summary;
+    return [range, gist].filter(Boolean).join("  ") || "Segment";
+  }
+
+  return node.labels[0] || node.id.slice(0, 8);
 }
 
 function getNodeSize(labels: string[]): number {
@@ -173,27 +215,72 @@ export function ContextGraphView({ externalGraphData, onAskAbout }: ContextGraph
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
   const [selectedRelId, setSelectedRelId] = useState<string | null>(null);
   const [expandedNodeIds, setExpandedNodeIds] = useState<Set<string>>(new Set());
+  const [highlightedNodeIds, setHighlightedNodeIds] = useState<Set<string>>(new Set());
   const [graphData, setGraphData] = useState<InternalGraphData | null>(null);
 
-  // Load schema on mount
+  // Read inside the chat-results effect without making it re-run on view changes.
+  const isSchemaViewRef = useRef(isSchemaView);
   useEffect(() => {
-    loadSchema();
+    isSchemaViewRef.current = isSchemaView;
+  }, [isSchemaView]);
+
+  // Open on the actual graph. The schema view is a picture of the data model —
+  // four generic bubbles — which reads as "there is nothing here" when what the
+  // user wants to see is their videos. Fall back to it only on an empty graph.
+  useEffect(() => {
+    loadGraph();
   }, []);
 
-  // When external graph data arrives from chat, switch to data view
+  // When external graph data arrives from chat, fold it into the current view.
+  // An answer is a view *into* the graph, not a replacement for it — dropping
+  // everything else makes the graph the user was reading vanish on every
+  // question. Returned nodes are ringed instead, so they stand out in context.
   useEffect(() => {
-    if (externalGraphData?.results?.length) {
-      const data = extractNodesAndRels(externalGraphData.results);
-      if (data.nodes.length > 0) {
-        setGraphData(data);
+    if (!externalGraphData?.results?.length) return;
+    const data = extractNodesAndRels(externalGraphData.results);
+    if (data.nodes.length === 0) return;
+    setGraphData((prev) => (isSchemaViewRef.current ? data : mergeGraphs(prev, data)));
+    setHighlightedNodeIds(new Set(data.nodes.map((n) => n.id)));
+    setIsSchemaView(false);
+    setExpandedNodeIds(new Set());
+    setSelectedElement(null);
+    setSelectedNodeId(null);
+    setSelectedRelId(null);
+  }, [externalGraphData]);
+
+  async function loadGraph() {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await fetch(`${API_BASE}/cypher`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          query: `
+            MATCH (v:Video)-[hs:HAS_SEGMENT]->(s:Segment)
+            OPTIONAL MATCH (s)-[m:MENTIONS|ABOUT]->(x)
+            RETURN v, hs, s, m, x LIMIT 400
+          `,
+        }),
+        signal: AbortSignal.timeout(15000),
+      });
+      const data = await res.json();
+      const parsed = extractNodesAndRels(data.results || []);
+      if (parsed.nodes.length > 0) {
+        setGraphData(parsed);
         setIsSchemaView(false);
         setExpandedNodeIds(new Set());
         setSelectedElement(null);
-        setSelectedNodeId(null);
-        setSelectedRelId(null);
+        return;
       }
+    } catch (err) {
+      console.error("Error loading graph:", err);
+    } finally {
+      setLoading(false);
     }
-  }, [externalGraphData]);
+    // Nothing ingested yet — the model diagram is the only thing left to show.
+    loadSchema();
+  }
 
   async function loadSchema() {
     setLoading(true);
@@ -340,13 +427,14 @@ export function ContextGraphView({ externalGraphData, onAskAbout }: ContextGraph
     const nodes: NvlNode[] = graphData.nodes.map((node) => {
       const isSelected = selectedNodeId === node.id;
       const isExpanded = expandedNodeIds.has(node.id);
+      const isHighlighted = highlightedNodeIds.has(node.id);
       const isSchema = isSchemaView;
 
-      const caption =
-        (node.properties.name as string) ||
-        (node.properties.title as string) ||
-        node.labels[0] ||
-        node.id.slice(0, 8);
+      // The schema view is a picture of the data model, so labels are the point
+      // there; everywhere else the caption should say what the node actually is.
+      const caption = isSchema
+        ? node.labels[0] || node.id.slice(0, 8)
+        : getNodeCaption(node);
 
       // Build tooltip with full name and labels
       const tooltip = [
@@ -371,8 +459,12 @@ export function ContextGraphView({ externalGraphData, onAskAbout }: ContextGraph
           ? SCHEMA_NODE_SIZE
           : isSelected
             ? getNodeSize(node.labels) * 1.3
-            : getNodeSize(node.labels),
-        selected: isSelected,
+            : isHighlighted
+              ? getNodeSize(node.labels) * 1.2
+              : getNodeSize(node.labels),
+        // Ring the nodes the last answer returned so they read as the answer
+        // while the rest of the graph stays visible around them.
+        selected: isSelected || isHighlighted,
       };
     });
 
@@ -389,7 +481,7 @@ export function ContextGraphView({ externalGraphData, onAskAbout }: ContextGraph
     });
 
     return { nodes, relationships };
-  }, [graphData, selectedNodeId, selectedRelId, expandedNodeIds, isSchemaView]);
+  }, [graphData, selectedNodeId, selectedRelId, expandedNodeIds, highlightedNodeIds, isSchemaView]);
 
   // Empty / error states
   if (error) {
@@ -422,15 +514,20 @@ export function ContextGraphView({ externalGraphData, onAskAbout }: ContextGraph
           <Text fontSize="xs" color="gray.500">
             {isSchemaView
               ? "Schema view — double-click a label to explore"
-              : "Video entity relationships"}
+              : highlightedNodeIds.size > 0
+                ? `Video entity relationships — ${highlightedNodeIds.size} nodes from the last answer are ringed`
+                : "Video entity relationships"}
           </Text>
         </Box>
         {!isSchemaView && (
           <IconButton
-            aria-label="Back to schema"
+            aria-label="Reload the full graph"
             size="xs"
             variant="ghost"
-            onClick={loadSchema}
+            onClick={() => {
+              setHighlightedNodeIds(new Set());
+              loadGraph();
+            }}
           >
             <RotateCcw size={14} />
           </IconButton>
