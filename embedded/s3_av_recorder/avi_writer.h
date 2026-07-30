@@ -13,14 +13,21 @@
  */
 
 struct AviWriter {
+  /* NOTE: never memset() this struct. File derives from Stream/Print and
+     carries a vtable pointer; zeroing it nulls the vptr, and copy-assignment
+     (w->f = SD.open(...)) does not restore it. Calls that the compiler can
+     devirtualize still work, so it fails only later, at the first virtual
+     dispatch through a File& — a LoadProhibited panic far from the cause.
+     Default member initialisers below make the memset unnecessary. */
   File      f;
-  uint32_t  frames;
-  uint32_t  movi_bytes;      /* payload after the 'movi' fourcc */
-  uint32_t  max_chunk;       /* largest JPEG seen, for dwSuggestedBufferSize */
-  uint16_t  width, height;
-  uint32_t *idx;             /* 4 words per frame: ckid, flags, offset, size */
-  uint32_t  idx_cap;
-  bool      ok;
+  uint32_t  frames     = 0;
+  uint32_t  movi_bytes = 0;   /* payload after the 'movi' fourcc */
+  uint32_t  max_chunk  = 0;   /* largest JPEG seen, for dwSuggestedBufferSize */
+  uint16_t  width      = 0;
+  uint16_t  height     = 0;
+  uint32_t *idx        = nullptr;  /* 4 words/frame: ckid, flags, offset, size */
+  uint32_t  idx_cap    = 0;
+  bool      ok         = false;
 };
 
 bool avi_open(AviWriter *w, const char *path, uint16_t width, uint16_t height,

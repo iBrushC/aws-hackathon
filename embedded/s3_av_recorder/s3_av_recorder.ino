@@ -25,7 +25,7 @@ void setup() {
   delay(300);
   Serial.println("\n=== XIAO ESP32S3 Sense A/V recorder ===");
   Serial.printf("[boot] PSRAM: %s (%u KB free)\n",
-                psramFound() ? "yes" : "NO",
+                psramFound() ? "yes" : "no (Tools > PSRAM > OPI PSRAM)",
                 (unsigned)(ESP.getFreePsram() / 1024));
 
   if (!video_begin()) fatal("camera");

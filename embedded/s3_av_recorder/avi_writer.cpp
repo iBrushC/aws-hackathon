@@ -45,11 +45,22 @@ static bool patch32(File &f, uint32_t offset, uint32_t value) {
   return f.write(b, 4) == 4;
 }
 
+static bool patch16(File &f, uint32_t offset, uint16_t value) {
+  uint8_t b[2];
+  put16(b, value);
+  if (!f.seek(offset)) return false;
+  return f.write(b, 2) == 2;
+}
+
 bool avi_open(AviWriter *w, const char *path, uint16_t width, uint16_t height,
               uint32_t max_frames) {
-  memset(w, 0, sizeof(*w));
-  w->width  = width;
-  w->height = height;
+  /* Explicit field reset, NOT memset — see the note in avi_writer.h. */
+  w->frames     = 0;
+  w->movi_bytes = 0;
+  w->max_chunk  = 0;
+  w->ok         = false;
+  w->width      = width;
+  w->height     = height;
 
   /* 16 bytes per frame. Lives in PSRAM so it never competes with the
      internal DRAM that WiFi/camera want. */
@@ -213,6 +224,18 @@ uint32_t avi_close(AviWriter *w, uint32_t elapsed_ms) {
   patch32(w->f, OFF_STRH + 32,        w->frames);
   patch32(w->f, OFF_STRH + 36,        w->max_chunk);
   patch32(w->f, OFF_MOVI_SIZE,        4 + w->movi_bytes);
+
+  /* Dimensions are not known until the first frame arrives, so they were
+     written as zeros by avi_open and have to be patched here too. All three
+     header structures carry them independently and players disagree about
+     which one they trust, so all three must agree. */
+  patch32(w->f, OFF_AVIH + 32,        w->width);
+  patch32(w->f, OFF_AVIH + 36,        w->height);
+  patch16(w->f, OFF_STRH + 52,        w->width);   /* rcFrame.right  */
+  patch16(w->f, OFF_STRH + 54,        w->height);  /* rcFrame.bottom */
+  patch32(w->f, OFF_BIH  +  4,        w->width);   /* biWidth  */
+  patch32(w->f, OFF_BIH  +  8,        w->height);  /* biHeight */
+  patch32(w->f, OFF_BIH  + 20,        (uint32_t)w->width * w->height * 3);
 
   w->f.flush();
   w->f.close();

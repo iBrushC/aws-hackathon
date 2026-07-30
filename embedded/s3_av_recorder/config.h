@@ -4,10 +4,9 @@
 /* =========================================================================
  *  TARGET: Seeed XIAO ESP32S3 Sense (OV2640 or OV5640 + PDM mic + SPI microSD)
  *
- *  Camera pins come from the board package's camera_pins.h via this define,
- *  so there is no hand-maintained pin map here. Do not remove it.
+ *  Camera pins live in this sketch's own camera_pins.h — see the note at the
+ *  top of that file for why it is not pulled from the board package.
  * ========================================================================= */
-#define CAMERA_MODEL_XIAO_ESP32S3
 
 /* =========================================================================
  *  CLIP CADENCE
@@ -28,12 +27,15 @@
  *
  *  VIDEO_MAX_FRAMES sizes the in-RAM idx1 table (16 bytes/frame). It is a
  *  ceiling, not a target: 600 frames over a 10 s clip = 60 fps headroom.
+ *  The _NO_PSRAM variant is used when the table has to live in internal DRAM,
+ *  where the space is scarce and the achievable frame rate is lower anyway.
  * ========================================================================= */
 #define CAM_FRAMESIZE          FRAMESIZE_VGA
 #define CAM_JPEG_QUALITY       12       /* 10 best/biggest .. 63 worst/smallest */
 #define CAM_XCLK_HZ            20000000
-#define CAM_FB_COUNT           2
+#define CAM_FB_COUNT           2        /* PSRAM only; DRAM path forces 1 */
 #define VIDEO_MAX_FRAMES       600
+#define VIDEO_MAX_FRAMES_NO_PSRAM 200
 
 /* =========================================================================
  *  AUDIO — onboard PDM microphone
