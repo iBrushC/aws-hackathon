@@ -4,11 +4,12 @@ from __future__ import annotations
 
 import asyncio
 import json
+import logging
 import uuid as _uuid
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Query
 from pydantic import BaseModel, Field
-from starlette.responses import StreamingResponse
+from starlette.responses import StreamingResponse, FileResponse, RedirectResponse
 
 from app.agent import handle_message, handle_message_stream
 from app.context_graph_client import (
@@ -244,3 +245,63 @@ async def scenarios():
             ]},
         ],
     }
+
+
+# ---------------------------------------------------------------------------
+# Entities — headshots (lazy, on demand)
+# ---------------------------------------------------------------------------
+
+@router.get("/entities/{entity_key}/headshot")
+async def entity_headshot(entity_key: str, redirect: bool = Query(False)):
+    """Return the URL of an entity's professional headshot, generating one
+    on demand if we don't have it yet.
+
+    Pipeline (see app.headshot):
+      1. Look up the Person in Neo4j; if ``headshot_url`` is already set,
+         return it (cached).
+      2. Otherwise find the earliest Segment that ``MENTIONS`` this person,
+         pull a representative frame from the Video's HLS playback at that
+         timestamp with ffmpeg, and send it to OpenAI's image-edit endpoint
+         with a "professional headshot" prompt.
+      3. Persist the resulting PNG under ``static/headshots/<key>.png`` and
+         write ``headshot_url`` on the Entity node so we never generate twice.
+
+    With ``?redirect=true`` (handy for ``<img src=...>``), returns a 302 to
+    the static file instead of the JSON body.
+    """
+    _require_neo4j()
+    from app.headshot import ensure_headshot, HeadshotError
+
+    try:
+        result = await ensure_headshot(entity_key)
+    except HeadshotError as e:
+        logging.getLogger(__name__).warning("Headshot failed for %s: %s", entity_key, e)
+        # Distinguish "no ffmpeg" -> 503 so the UI can show "ffmpeg missing";
+        # everything else (missing video URL, OpenAI error, etc.) is 502.
+        if "ffmpeg" in str(e).lower():
+            raise HTTPException(status_code=503, detail=str(e))
+        raise HTTPException(status_code=502, detail=str(e))
+    except Exception as e:
+        logging.getLogger(__name__).exception("Headshot crashed for %s", entity_key)
+        raise HTTPException(status_code=500, detail=str(e))
+
+    url = result["url"]
+    if redirect:
+        return RedirectResponse(url=url, status_code=302)
+    return {"entity_key": entity_key, "url": url, "cached": result.get("cached", False)}
+
+
+@router.get("/entities/{entity_key}/headshot.png")
+async def entity_headshot_file(entity_key: str):
+    """Serve the on-disk headshot PNG straight from ``static/headshots/`` if it
+    exists. Routes through this so the frontend never needs the static URL."""
+    from pathlib import Path
+    from app.config import settings
+
+    safe = "".join(c if c.isalnum() or c in "-_" else "_" for c in entity_key)
+    root = Path(settings.headshot_static_dir).resolve()
+    candidate = (root / f"{safe}.png").resolve()
+    if not str(candidate).startswith(str(root)) or not candidate.exists():
+        raise HTTPException(status_code=404, detail="No headshot yet — call "
+                            "/api/entities/{key}/headshot first to generate one.")
+    return FileResponse(candidate, media_type="image/png")

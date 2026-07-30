@@ -16,6 +16,7 @@ CREATE INDEX video_title IF NOT EXISTS FOR (n:Video) ON (n.title);
 CREATE INDEX segment_video_id IF NOT EXISTS FOR (n:Segment) ON (n.video_id);
 CREATE INDEX entity_name IF NOT EXISTS FOR (n:Entity) ON (n.name);
 CREATE INDEX entity_type IF NOT EXISTS FOR (n:Entity) ON (n.type);
+CREATE INDEX entity_headshot_url IF NOT EXISTS FOR (n:Entity) ON (n.headshot_url);
 CREATE INDEX topic_name IF NOT EXISTS FOR (n:Topic) ON (n.name);
 
 // Domain scoping (all queries filter by n.domain to support multi-domain reuse)

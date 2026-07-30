@@ -2,9 +2,11 @@
 
 import logging
 from contextlib import asynccontextmanager
+from pathlib import Path
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 
 from app.config import settings
 from app.context_graph_client import connect_neo4j, close_neo4j, is_connected
@@ -72,3 +74,11 @@ async def health():
         "domain": settings.domain_id,
         "version": "0.1.0",
     }
+
+
+# Serve generated headshots straight off disk so <img src="/static/headshots/...">
+# works without going through the route. The directory is created at startup
+# so it always exists; missing ffmpeg just means the endpoint returns 503.
+static_dir = Path(settings.headshot_static_dir).resolve()
+static_dir.mkdir(parents=True, exist_ok=True)
+app.mount("/static", StaticFiles(directory=str(static_dir.parent)), name="static")

@@ -78,6 +78,26 @@ class Settings(BaseSettings):
     # the Next.js frontend on frontend_port".
     cors_origins: str = ""
 
+    # --- Headshots (lazy, on demand) ----------------------------------------
+    # Generated on first GET /api/entities/{key}/headshot and cached in Neo4j +
+    # on disk under static/headshots/. The frame from the HLS playback at the
+    # first segment that mentions the person is sent to OpenAI's image-edit
+    # endpoint with a "professional headshot" instruction; the result is what
+    # gets served.
+    headshot_static_dir: str = "../static/headshots"
+    headshot_url_prefix: str = "/static/headshots"
+    headshot_openai_model: str = "gpt-image-1"
+    headshot_prompt: str = (
+        "Turn this video frame into a polished professional headshot of the "
+        "person shown. Keep their identity (face, hair, skin tone, age) "
+        "recognizable. Replace the background with a clean, soft studio "
+        "backdrop (subtle gradient, neutral color). Use flattering, even "
+        "studio lighting and frame the subject from the chest up, centered, "
+        "looking toward the camera with a natural confident expression. Do "
+        "not change clothing unless it is clearly casual; otherwise preserve "
+        "what they are wearing. Photorealistic, high resolution."
+    )
+
     model_config = {"env_file": "../.env", "env_file_encoding": "utf-8", "extra": "ignore"}
 
     @property
