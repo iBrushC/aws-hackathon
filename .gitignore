@@ -1,4 +1,30 @@
-*.pem
-.venv/
+# Dependencies
+node_modules/
 __pycache__/
 *.pyc
+.venv/
+venv/
+
+# Environment
+.env
+.env.local
+
+# Build
+.next/
+dist/
+build/
+*.egg-info/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Data
+data/documents/*.json
+data/documents/*.txt

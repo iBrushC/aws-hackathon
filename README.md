@@ -1,334 +1,289 @@
-# Conference People Context Graph
+# Video Agent Context Graph
 
-> Turn conference videos into a searchable network of people, expertise,
-> conversations, and evidence.
+**Video is evidence.** Point it at raw video and this app builds a live Neo4j
+knowledge graph of what is *shown, said, and written* — then lets an
+OpenAI-brained agent answer questions over it, with a live graph visualization.
 
-This project is being built for the
-[Hack the Video Agent Context Graph](https://luma.com/hack-video-agent-context-graph-jul30-2026)
-hackathon.
+> Uses all four: **TwelveLabs** (Marengo + Pegasus video understanding) ·
+> **OpenAI** (agent brain + entity canonicalization) · **AWS Strands** (agent +
+> tool orchestration) · **Neo4j** (context graph + vector index + NVL viz).
 
-## Project Summary
-
-Conference recordings contain valuable knowledge about speakers, attendees,
-topics, and conversations, but that information remains locked inside hours of
-video.
-
-Conference People Context Graph converts recorded sessions and conversations
-into structured, searchable professional profiles. Users can search for a
-person, technology, industry, or research topic and discover relevant experts,
-related speakers, their conversations, and the exact video moments supporting
-each result.
-
-The project uses:
-
-- **TwelveLabs** to understand video across vision, audio, speech, and on-screen
-  content.
-- **OpenAI GPT-5.6** to reason over extracted context and generate structured
-  profiles.
-- **Strands Agents** to orchestrate the video-to-graph pipeline.
-- **AWS** to run GPT-5.6 through Amazon Bedrock and host the supporting
-  infrastructure.
-- **Neo4j Aura** to store and query the people context graph.
-
-## Problem
-
-Conference participants often want to answer questions such as:
-
-- Who spoke about GraphRAG?
-- Which speakers work in healthcare AI?
-- Who discussed both video understanding and knowledge graphs?
-- What did a specific speaker say about a topic?
-- Which people share similar interests?
-- Where in the original video is the evidence?
-
-Manually watching every recording and researching every person is too slow.
-Traditional keyword search also loses the relationships between people, topics,
-sessions, and conversations.
-
-## Proposed Solution
-
-The system processes conference videos and automatically:
-
-1. Detects speech, visual context, on-screen text, scenes, and important
-   timestamps.
-2. Identifies individual speakers and separates their utterances.
-3. Extracts names, organizations, professional domains, topics, and claims.
-4. Creates a structured profile for each person.
-5. Links every extracted fact to its source video segment.
-6. Stores people, topics, sessions, and evidence in Neo4j.
-7. Provides a web interface for semantic and graph-based discovery.
-
-Each generated profile follows a structure similar to:
-
-```json
-{
-  "name": "Speaker name",
-  "organization": "Company or institution",
-  "role": "Professional role",
-  "domains": ["Artificial Intelligence"],
-  "topics": ["GraphRAG", "Video Understanding"],
-  "profileSummary": "Short evidence-grounded biography",
-  "statements": [
-    {
-      "text": "What the person said",
-      "startSec": 125.4,
-      "endSec": 142.1,
-      "confidence": 0.91
-    }
-  ],
-  "portraitUrl": "Representative frame",
-  "sourceVideoUrl": "Original recording"
-}
-```
-
-Names that cannot be determined reliably remain `Unknown Speaker 1`,
-`Unknown Speaker 2`, and so on until they are manually confirmed. The system
-does not invent identities.
+The thesis: the same entity seen across many independent videos MERGEs to **one**
+node — so the graph grows richer instead of duplicating.
 
 ## Architecture
 
-```mermaid
-flowchart LR
-    A["Conference Video"] --> B["Amazon S3"]
-    B --> C["TwelveLabs Assets API"]
-    C --> D["TwelveLabs Knowledge Store"]
-    D --> E["TwelveLabs Responses API"]
-    E --> F["Structured Video Context JSON"]
-
-    F --> G["Strands Agent Orchestrator"]
-    G --> H["GPT-5.6 on Amazon Bedrock"]
-    H --> I["Identity Resolution and Profile Synthesis"]
-    I --> J["Neo4j Aura Context Graph"]
-
-    B --> K["Timestamp-based Frame and Clip Extraction"]
-    K --> L["S3 Media Assets"]
-    L --> J
-
-    J --> M["Search and Recommendation API"]
-    M --> N["Web Application"]
+```
+video-context-graph/
+├── backend/          FastAPI + Strands (OpenAI) agent, TwelveLabs ingestion
+│   ├── app/twelvelabs_client.py   Marengo embed/search + Pegasus analyze
+│   ├── app/agent.py               OpenAI agent + graph tools (SSE streaming)
+│   ├── app/vector_client.py       Neo4j vector search over segment embeddings
+│   ├── app/routes.py              FastAPI endpoints
+│   └── scripts/ingest.py          video -> Pegasus -> OpenAI -> Neo4j pipeline
+├── frontend/         Next.js + Chakra UI + NVL (chat | graph | video inspector)
+├── cypher/schema.cypher           constraints + vector index
+├── data/ontology.yaml             Video/Segment/Entity/Topic ontology
+└── .env                           credentials (not committed)
 ```
 
-### Technology Responsibilities
+### Graph model
 
-| Technology | Responsibility |
-| --- | --- |
-| TwelveLabs | Multimodal video understanding, entity and topic extraction, timestamp discovery, and corpus-level video reasoning |
-| Strands Agents | Ingestion, polling, extraction, reasoning, validation, and database-write orchestration |
-| OpenAI GPT-5.6 | Data normalization, entity resolution, profile creation, tool calls, and user-query interpretation |
-| Amazon Bedrock | GPT-5.6 inference using AWS credits and AWS-managed infrastructure |
-| AWS | S3 media storage, backend services, observability, and application hosting |
-| Neo4j Aura | Context graph storage and relationship discovery |
-| Web application | Person and topic search, profiles, graph visualization, and evidence playback |
-
-TwelveLabs' workflow is to create an asset, wait until it is ready, add it to a
-knowledge store, wait for indexing, and query the Responses API. Its structured
-output support allows the extraction pipeline to return schema-constrained JSON.
-See the
-[TwelveLabs quickstart](https://docs.twelvelabs.io/agents/get-started/quickstart/create-a-response)
-and
-[structured-output guide](https://docs.twelvelabs.io/agents/guides/create-a-response/structured-output).
-
-## Agent Design
-
-The runtime agent is implemented with **Strands Agents**, as specified by the
-hackathon challenge.
-
-### Agent Tools
-
-- `upload_video`
-- `check_asset_status`
-- `add_to_knowledge_store`
-- `extract_video_context`
-- `extract_representative_frame`
-- `resolve_person_identity`
-- `validate_profile`
-- `write_context_graph`
-- `search_people`
-- `retrieve_evidence`
-
-### GPT-5.6 Model Routing
-
-- **GPT-5.6 Luna:** Fast, high-volume cleanup, tagging, classification, and
-  routing.
-- **GPT-5.6 Terra:** Main profile generation, entity normalization, and
-  user-query interpretation.
-- **GPT-5.6 Sol:** Difficult identity reconciliation, cross-session reasoning,
-  and complex graph questions.
-
-All three models are available through the OpenAI-compatible Responses API on
-Amazon Bedrock. See the
-[AWS GPT-5.6 Bedrock guide](https://aws.amazon.com/blogs/machine-learning/get-started-with-openai-gpt-5-6-sol-terra-and-luna-on-amazon-bedrock/).
-
-The integration demonstrates:
-
-- Multimodal input
-- Structured JSON output
-- Function calling
-- Programmatic or code-based tool calling
-- Reasoning-effort configuration
-- Persisted reasoning for multi-turn search
-- Context compaction for long-running agent sessions
-
-See the
-[OpenAI GPT-5.6 model guidance](https://developers.openai.com/api/docs/guides/latest-model)
-for current capability and prompting details.
-
-## Neo4j Context Graph
-
-### Node Model
-
-```text
-(:Person)
-(:Organization)
-(:Domain)
-(:Topic)
-(:Conference)
-(:Session)
-(:MediaAsset)
-(:TranscriptSegment)
-(:TranscriptChunk)
+```
+(:Video)-[:HAS_SEGMENT]->(:Segment {embedding})   // vector index on Segment.embedding
+(:Segment)-[:NEXT]->(:Segment)                     // temporal order
+(:Segment)-[:MENTIONS]->(:Entity)                  // MERGE'd across videos (key = normalized name)
+(:Segment)-[:ABOUT]->(:Topic)                      // MERGE'd across videos (key = normalized name)
 ```
 
-### Relationships
+`Entity` and `Topic` nodes are keyed by their **normalized name**, so the same
+person/place/object appearing in two different videos collapses to one node —
+that shared node is the whole point.
 
-```text
-(:Person)-[:WORKS_AT]->(:Organization)
-(:Person)-[:SPECIALIZES_IN]->(:Domain)
-(:Person)-[:SPOKE_IN]->(:TranscriptSegment)
-(:Person)-[:PRESENTED_AT]->(:Session)
-(:Session)-[:PART_OF]->(:Conference)
-(:Session)-[:RECORDED_AS]->(:MediaAsset)
-(:TranscriptSegment)-[:FROM_ASSET]->(:MediaAsset)
-(:TranscriptSegment)-[:DISCUSSES]->(:Topic)
-(:TranscriptSegment)-[:HAS_CHUNK]->(:TranscriptChunk)
-(:Topic)-[:BELONGS_TO]->(:Domain)
+## Prerequisites
+
+- **[uv](https://docs.astral.sh/uv/)** (Python 3.10–3.13) — backend
+- **Node.js 18+** / npm — frontend
+- **Neo4j 2025.x+** — Aura free (`neo4j+s://…`) or local Docker (`make docker-up`).
+  A vector index is required, which modern Neo4j provides out of the box.
+- **API keys**: [OpenAI](https://platform.openai.com/) and
+  [TwelveLabs](https://playground.twelvelabs.io/) (a free tier works).
+
+## Quick start
+
+```bash
+cp .env.example .env      # fill in NEO4J_*, OPENAI_API_KEY, TWELVE_LABS_API_KEY
+make install              # backend (uv sync) + frontend (npm install)
+make seed                 # ingest the vendored sample clip -> build the graph
+make start                # backend :8000 + frontend :3000
 ```
 
-Relationship properties hold extraction confidence, timestamps, frequency, and
-evidence counts. Embeddings are stored on dedicated `TranscriptChunk` nodes
-rather than directly on `Person` nodes.
+- **Frontend:** http://localhost:3000 — chat, live NVL graph, video inspector
+- **Backend:** http://localhost:8000 — `GET /health`, `/api/...`
 
-### Questions the Graph Must Answer
+Open the frontend, ask *"What videos do we have and what are they about?"*, and
+watch the graph light up.
 
-1. Find people who discussed a selected topic.
-2. Find people with expertise across multiple selected domains.
-3. Find speakers related through shared topics or sessions.
-4. Show the exact evidence supporting a person's profile.
-5. Discover topics frequently discussed together.
-6. Recommend people similar to a selected speaker.
-7. Search conversation content semantically and traverse back to the speaker.
+---
 
-Neo4j Aura Free is sufficient for the hackathon MVP. The
-[Neo4j Agent Skills](https://neo4j.com/labs/genai-ecosystem/agent-skills/neo4j-skills/)
-support Aura, modeling, Cypher, imports, vector search, and GraphRAG workflows.
+## Loading videos
 
-## Web Experience
+All ingestion goes through `backend/scripts/ingest.py`. `make seed` is a thin
+wrapper around it. There are **three ways** to add a video, and you can mix them.
 
-### Search
+### The vendored sample (zero config)
 
-Users can enter natural-language queries such as:
+The repo ships a ready-to-use clip at `data/videos/bbb_1080p_30fps_normal_85sec.mp4`
+(an 85-second excerpt of _Big Buck Bunny_ — see [Sample video & attribution](#sample-video--attribution)).
+Running `make seed` with **no arguments** ingests every `.mp4` in `data/videos/`,
+so a fresh clone builds a populated graph out of the box:
 
-- "Find speakers working on AI agents for healthcare."
-- "Who talked about Neo4j and video understanding?"
-- "Show people interested in multimodal search."
-- "What did Alice say about graph databases?"
+```bash
+make seed
+```
 
-Each result displays:
+Drop your own `.mp4` files into `data/videos/` and they'll be picked up the same way.
 
-- Name and representative image
-- Organization and role
-- Domains and topics
-- Short profile summary
-- Relevance explanation
-- Supporting quotes
-- Playable timestamped video evidence
-- Related people
+### 1. Public MP4 URL (simplest)
 
-### Person Profile
+TwelveLabs downloads the file server-side, so the URL must be **directly and
+publicly fetchable**.
 
-A profile contains:
+```bash
+# via make (uses the same index as everything else)
+make seed VIDEOS="https://example.com/a.mp4 https://example.com/b.mp4"
 
-- Professional summary
-- Domains and expertise
-- Conference appearances
-- Extracted conversations
-- Evidence clips
-- Related speakers
-- Interactive local graph
+# or call the script directly
+cd backend && uv run python scripts/ingest.py https://example.com/a.mp4
+```
 
-## Hackathon MVP
+### 2. Local `.mp4` file
 
-### Must Have
+The file is uploaded into your TwelveLabs index. After indexing, the app stores
+the HLS URL TwelveLabs returns so the clip still plays back in the UI.
 
-- Upload one or more conference videos.
-- Process them through TwelveLabs.
-- Extract at least three people and their statements.
-- Generate structured person profiles.
-- Store people, topics, segments, and relationships in Neo4j.
-- Search by person, domain, or topic.
-- Open a profile and play the supporting video timestamp.
-- Display related people through graph connections.
+```bash
+cd backend && uv run python scripts/ingest.py /path/to/clip.mp4
+```
 
-### Stretch Goals
+### 3. A video already indexed in your TwelveLabs account (no re-upload)
 
-- Cross-video identity resolution
-- Interactive Neo4j graph visualization
-- Natural-language graph questions
-- Real-time ingestion during a conference
-- User corrections for speaker identity
-- Contact or meeting recommendations
-- Multilingual transcript search
+If you already indexed a video in TwelveLabs, ingest it straight into the graph
+by id — this skips upload/indexing and goes right to analyze → embed → write.
 
-## One-Day Execution Plan
+```bash
+cd backend && uv run python scripts/ingest.py \
+    --index-id=<TL_INDEX_ID> --video-id=<TL_VIDEO_ID>
+```
 
-### Phase 1: Foundation
+> The `index_id`/`video_id` **must belong to the account behind
+> `TWELVE_LABS_API_KEY`** in your `.env`. Ids from a different account return
+> `403 read_not_allowed`.
 
-- Configure AWS credentials and Bedrock model access.
-- Create an S3 bucket and Neo4j Aura instance.
-- Configure TwelveLabs API credentials and a knowledge store.
-- Install and verify the Agent Toolkit for AWS and Neo4j Agent Skills.
+### What ingestion does (per video)
 
-The current official AWS name is **Agent Toolkit for AWS**. For Codex, AWS
-documents marketplace installation or the `aws configure agent-toolkit` setup
-flow in the
-[Agent Toolkit quickstart](https://docs.aws.amazon.com/agent-toolkit/latest/userguide/quick-start.html).
+1. **Index** the video with TwelveLabs (Marengo + Pegasus) — `tasks.create` +
+   `wait_for_done` (skipped for method 3).
+2. **Analyze** with **Pegasus** → a rich, time-coded description.
+3. **Structure** that prose with **OpenAI Structured Outputs** → schema-validated
+   segments, each with a summary, on-screen text, transcript, canonicalized
+   entities, and topics.
+4. **Embed** each segment with **Marengo** (512-dim) for the Neo4j vector index.
+5. **Write** to Neo4j: `Video`/`Segment` created, `Entity`/`Topic` **MERGE**'d
+   across videos, a temporal `NEXT` chain, and the vector index ensured.
 
-### Phase 2: Video Pipeline
+Indexing a short clip takes ~1–2 minutes; longer videos take proportionally more.
 
-- Upload one short test video.
-- Wait for TwelveLabs asset and knowledge-store readiness.
-- Request schema-constrained extraction.
-- Produce speaker, transcript, topic, and timestamp JSON.
-- Extract representative frames from the source video using those timestamps.
+### Video requirements
 
-### Phase 3: Graph and Reasoning
+- **Format/access:** direct MP4 over http(s). YouTube/Drive/S3-signed **share**
+  links do **not** work — TwelveLabs must be able to `GET` the raw file.
+  (The old `commondatastorage.googleapis.com/gtv-videos-bucket/*` samples now
+  return 403; `https://test-videos.co.uk/...` clips are known-good.)
+- **Resolution:** use **360p or higher** — very small frames are rejected.
+- **Duration:** at least ~4 seconds.
+- See [TwelveLabs' limits](https://docs.twelvelabs.io/) for exact size/duration bounds.
 
-- Create Neo4j constraints and indexes.
-- Normalize people, topics, and domains with GPT-5.6.
-- Write the context graph.
-- Implement name, full-text, and semantic search.
-- Verify that every generated profile has source evidence.
+### Re-ingesting is safe (idempotent)
 
-### Phase 4: Web and Demo
+Re-running ingestion for the same video **replaces** that video's old segments
+(and their embeddings) and re-MERGEs shared entities/topics — no duplicate
+`Video`/`Segment` nodes. So you can tweak the pipeline and re-seed freely.
 
-- Build search and profile pages.
-- Add timestamped video playback.
-- Add a related-people graph.
-- Prepare three reliable demo queries.
-- Preprocess demo videos to avoid waiting for indexing during judging.
+### See the cross-video merge
 
-## Demo Story
+Ingest **two different clips that share a subject** (e.g. both feature the same
+person, place, or object). Their shared `Entity`/`Topic` nodes become a single
+node connected to both videos — visible as a hub in the graph.
 
-1. Upload a conference recording.
-2. Show the multimodal context extracted by TwelveLabs.
-3. Show the agent generating structured person profiles.
-4. Open Neo4j and display the resulting context graph.
-5. Search for "Who discussed multimodal AI and knowledge graphs?"
-6. Select a person and inspect their profile.
-7. Play the exact video segment supporting the result.
-8. Open a related person and explain the graph path connecting them.
+👉 **[HOWTO.md](HOWTO.md)** is a step-by-step walkthrough of adding a first
+video, then a second, and exactly how/why the entities and topics merge.
 
-**Closing message:** Conference People Context Graph turns unstructured video
-into a living professional knowledge network, allowing users to discover not
-only what was said, but who said it, where the evidence is, and how people and
-ideas are connected.
+### Reset the graph
+
+```bash
+make reset        # ⚠️ DETACH DELETE every node in the Neo4j database
+make schema       # re-apply constraints + indexes only (no data)
+```
+
+`make reset` wipes the **entire** database, not just this domain — don't run it
+against a Neo4j instance you share with other data.
+
+---
+
+## Configuration (`.env`)
+
+| Variable | Default | Purpose |
+|---|---|---|
+| `NEO4J_URI` | `neo4j://localhost:7687` | Bolt URI (Aura: `neo4j+s://…`) |
+| `NEO4J_USERNAME` / `NEO4J_PASSWORD` | `neo4j` / — | Neo4j auth |
+| `NEO4J_DATABASE` | `neo4j` | Target database |
+| `OPENAI_API_KEY` | — | Agent reasoning + structured video extraction |
+| `OPENAI_MODEL` | `gpt-5.6` | Strands agent reasoning and graph tools |
+| `OPENAI_EXTRACTION_MODEL` | `gpt-5.6-terra` | Schema-validated video and entity extraction |
+| `OPENAI_REASONING_EFFORT` | `low` | Keeps agent and extraction responses fast; also accepts `none` |
+| `TWELVE_LABS_API_KEY` | — | Read by the TwelveLabs SDK |
+| `TL_INDEX_ID` | *(empty)* | Reuse a specific index; else created/found by name |
+| `TL_INDEX_NAME` | `video-context-graph` | Index name when creating |
+| `MARENGO_MODEL` | `marengo3.0` | Index + search model |
+| `PEGASUS_MODEL` | `pegasus1.2` | Analyze model (index-creatable) |
+| `MARENGO_EMBED_MODEL` | `marengo3.0` | Segment embeddings (512-dim) |
+| `SAMPLE_VIDEO_URLS` | a Big Buck Bunny clip | Default clip(s) for `make seed` |
+| `DOMAIN_ID` | `video-context-graph` | Tags all nodes; keep consistent across ingest + app |
+| `BACKEND_PORT` / `FRONTEND_PORT` | `8000` / `3000` | Ports |
+| `CORS_ORIGINS` | `http://localhost:3000` | Comma-separated allowed origins |
+
+### Models — why these versions
+
+| Role | Value | Note |
+|---|---|---|
+| Index + search | `marengo3.0` | multimodal (visual + audio + transcription) |
+| Analyze | `pegasus1.2` | the Pegasus version an index accepts at creation |
+| Segment embeddings | `marengo3.0` | 512-dim text embeddings → Neo4j vector index |
+| Agent brain | `gpt-5.6` | via Strands `OpenAIResponsesModel`, with low reasoning |
+| Video extraction | `gpt-5.6-terra` | OpenAI Structured Outputs with a typed segment schema |
+
+> Note: TwelveLabs accepts `pegasus1.2` when **creating** an index but
+> `pegasus1.5` is analyze-only. The embedding dimension (512 for `marengo3.0`)
+> is auto-detected at ingest time and the vector index is created to match.
+
+---
+
+## Make targets
+
+| Target | What it does |
+|---|---|
+| `make install` | Install backend (uv) + frontend (npm) deps |
+| `make seed [VIDEOS="..."]` | Ingest videos (env sample, or the given URLs/paths) |
+| `make schema` | Apply Neo4j constraints + indexes only |
+| `make start` | Run backend + frontend together |
+| `make dev-backend` / `dev-frontend` | Run one side |
+| `make reset` | ⚠️ Delete all nodes in Neo4j |
+| `make test-connection` | Verify Neo4j connectivity |
+| `make docker-up` / `docker-down` | Local Neo4j via Docker |
+| `make test` | Backend unit tests, frontend type-check, and end-to-end test discovery |
+| `make test-e2e` | Run end-to-end tests against the running, seeded application |
+| `make lint` | Linters |
+
+## API endpoints
+
+| Method + path | Purpose |
+|---|---|
+| `GET /health` | Backend + Neo4j status |
+| `POST /api/chat` | One-shot agent turn |
+| `POST /api/chat/stream` | Streaming agent turn (SSE) |
+| `GET /api/videos` | List ingested videos + segment counts |
+| `GET /api/videos/{id}/segments` | A video's segments in order |
+| `POST /api/search` | Live multimodal search via TwelveLabs |
+| `GET /api/schema` · `GET /api/schema/visualization` | Graph schema |
+| `POST /api/expand` | Neighbors of a node (graph drill-down) |
+| `POST /api/cypher` | Run a read Cypher query |
+
+## The agent's tools
+
+- `search_video_moments` — embed the query with Marengo, vector-search Segments (find-the-moment)
+- `explore_graph` — traverse everything involving an entity/topic/video across all videos
+- `twelvelabs_search` — live multimodal Marengo search straight from TwelveLabs
+- `run_cypher` / `get_graph_schema` — arbitrary read-only graph access
+
+---
+
+## Troubleshooting
+
+| Symptom | Cause / fix |
+|---|---|
+| `media_url_not_accessible` on ingest | The URL isn't directly fetchable by TwelveLabs. Use a raw MP4 link (not a share/streaming page). |
+| `403 read_not_allowed` with `--video-id` | That video/index belongs to a different TwelveLabs account than `TWELVE_LABS_API_KEY`. Use the matching key, or re-upload the file. |
+| `parameter_invalid ... model_name` | Index creation only accepts `marengo3.0` + `pegasus1.2`. Check `MARENGO_MODEL`/`PEGASUS_MODEL`. |
+| Ingest succeeds but 0 segments / empty entities | The clip has little to describe (e.g. a static cartoon frame). Try a richer/longer clip. |
+| Health shows `degraded`, `neo4j:false` | Neo4j unreachable — check `NEO4J_URI/USERNAME/PASSWORD`; `make test-connection`. |
+| Nodes tagged with the wrong `domain` | `DOMAIN_ID` in `.env` differs from when you ingested. Keep it consistent; re-seed or re-tag. |
+| Vector search returns nothing | Vector index not built (no embeddings were produced). Re-run `make seed`. |
+
+---
+
+## Sample video & attribution
+
+The repo vendors a sample clip at `data/videos/bbb_1080p_30fps_normal_85sec.mp4`
+— an **85-second excerpt of _Big Buck Bunny_** (2008), trimmed and re-encoded
+from a copy downloaded from blender.org.
+
+- **© copyright 2008, Blender Foundation / [www.bigbuckbunny.org](https://peach.blender.org/)**
+- **License: [Creative Commons Attribution 3.0 (CC-BY 3.0)](https://creativecommons.org/licenses/by/3.0/)**
+
+_Big Buck Bunny_ is a Creative Commons–licensed **open movie**: it may be reused,
+redistributed, and adapted — including commercially — provided the Blender
+Foundation is properly attributed. It is included here **solely as a sample input
+for research, testing, and demonstration** of this project's pipeline; no
+endorsement by the Blender Foundation is implied. See
+[`data/videos/ATTRIBUTION.md`](data/videos/ATTRIBUTION.md).
+
+**Bring your own media responsibly.** Any video you add is your responsibility —
+ensure you hold the rights or a license that permits your use. This project makes
+no representation about third-party clips you choose to ingest.
+
+---
+
+> started from
+> [create-context-graph](https://github.com/neo4j-labs/create-context-graph),
+> repointed to video. Maintained by the community; not officially supported.

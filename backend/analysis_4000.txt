@@ -1,0 +1,164 @@
+The video is a dynamic, multi-segmented documentary-style recording capturing a series of interviews and interactions at a tech-focused hackathon or innovation event, likely hosted at a collaborative workspace such as the "Builder's Loft." The footage unfolds in a continuous, real-time flow, blending candid conversations, on-the-ground demonstrations, and spontaneous exchanges among participants, all centered around AI, personal technology, and collaborative innovation.
+
+**Segment 1: 0s – 13s**  
+A man in a black cap stands near exit signs, briefly looking down before raising his gaze while holding a phone. No visible on-screen text. Spoken: “Hello. What's up? You are currently being recorded for a demo, which we're already collecting native for. What's your name? Brian.”  
+*Topic: Introduction and recording setup*
+
+**Segment 2: 13s – 23s**  
+A quick pan reveals a room full of people working at tables with laptops; two green exit signs are visible near the back. No visible on-screen text. Spoken: “on a multimedia knowledge base for marketing. Interesting. There's actually a guy over there. He was thinking of UGC, of UGC analysis.”  
+*Topic: Project pitch and networking*
+
+**Segment 3: 24s – 34s**  
+A man discusses a side project focused on analyzing user-generated content (UGC) for virality. No visible on-screen text. Spoken: “He was really, really interested in that. So if you're looking for someone to... work with. He was saying I want to get like a bunch of these things and analyze what goes viral.”  
+*Topic: UGC analysis and viral content research*
+
+**Segment 4: 34s – 43s**  
+A man asks about a tool called “Sourcerfy,” questioning its pronunciation and function. No visible on-screen text. Spoken: “Sourcify? Sourcerfy? How do you pronounce that? What is Sourcerfy?”  
+*Topic: Tool discovery and name clarification*
+
+**Segment 5: 46s – 56s**  
+A man confirms the project is a side initiative to learn new technology. No visible on-screen text. Spoken: “Nice. Nice. Okay, so this is kind of like a side project for your company? Yeah, this is the... It's kind of like learning the new technology that's out there.”  
+*Topic: Project scope and learning goals*
+
+**Segment 6: 56s – 66s**  
+The interviewer asks if the founder was sent by a company or chose to attend. The founder replies he is the founder. No visible on-screen text. Spoken: “I am the founder of it. Oh, you're the founder of it. Oh, okay. How early stage are you? Pre-seed to seed.”  
+*Topic: Startup stage and founder identity*
+
+**Segment 7: 66s – 76s**  
+The interviewer asks about clients and target market. The founder confirms it’s for small businesses. No visible on-screen text. Spoken: “Do you have clients or stuff like that that you're working with? Nice. That's super cool. And is this targeted at businesses or individual businesses? It's more targeted at businesses. Large, small? Small.”  
+*Topic: Target audience and business model*
+
+**Segment 8: 76s – 97s**  
+The founder shares challenges working with small businesses. No visible on-screen text. Spoken: “Small businesses. businesses yeah i i've been working with some small businesses and it is a bit of a nightmare i can't say that i would choose to go into it again but um very for that um anyway i need to go and record more people.”  
+*Topic: Real-world challenges in small business tech adoption*
+
+**Segment 9: 97s – 106s**  
+The interviewer directs the founder to speak with a “Finnish guy with curly blonde hair.” No visible on-screen text. Spoken: “because we're we're working with the demo but nice to meet you yeah definitely talk with the the finnish guy with the curly blonde hair okay yeah very nice yeah.”  
+*Topic: Networking and referral*
+
+**Segment 10: 115s – 126s**  
+A man explains the recording setup: a phone strapped to his chest. No visible on-screen text. Spoken: “We're already recording data for our demo. You're on video right now with the phone that's strapped to my chest. Or I say strapped, I'm holding it.”  
+*Topic: Technical setup and recording logistics*
+
+**Segment 11: 126s – 136s**  
+The interviewer asks about a “pocket note taker” device and its potential for video-based memory aid. No visible on-screen text. Spoken: “Have you seen the, what is it? Like the pocket note taker thing? Have you heard of that? Yeah, we're trying to do that with a video.”  
+*Topic: Conceptualizing a video-powered note-taking tool*
+
+**Segment 12: 136s – 147s**  
+A man named Max is introduced. The interviewer asks about his role in an AI consultancy. No visible on-screen text. Spoken: “What's your name? My name's Max. Max. Andrew. Nice to meet you. Nice to meet you. You run an agency, right? The AI consultancy thing?”  
+*Topic: Introduction and professional identity*
+
+**Segment 13: 147s – 157s**  
+The interviewer clarifies Max is not the CEO. No visible on-screen text. Spoken: “Yeah, but I'm not the CEO. You're not? Oh, I see. I didn't know if you were running it or not.”  
+*Topic: Clarifying leadership roles*
+
+**Segment 14: 158s – 167s**  
+Max expresses uncertainty about his goal at the event. No visible on-screen text. Spoken: “And what's your goal while you're here? What are you investigating? What are you trying to prove? I don't know.”  
+*Topic: Uncertainty and exploration*
+
+**Segment 15: 170s – 182s**  
+The interviewer asks about the hackathon context. No visible on-screen text. Spoken: “what oh in this hackathon cmo using other people's videos have you figured out how you're going to be getting the reference videos yet or no no that's that's”  
+*Topic: Hackathon project planning*
+
+**Segment 16: 182s – 192s**  
+Max mentions using Apify to scrape Instagram videos. No visible on-screen text. Spoken: “apify or apify that guy i i actually I just messaged a friend who's scraped Instagram posts before he says that that's actually very good it's like three dollars per thousand videos”  
+*Topic: Data sourcing and tool selection*
+
+**Segment 17: 192s – 202s**  
+Max confirms Apify’s effectiveness in bypassing bots. No visible on-screen text. Spoken: “you could but these guys these guys are nice and that they they get around a lot of the bots and stuff like that um at least my my last experience with a hackathon i learned don't try and make stuff yourself if you don't have to because then you're going to get into rabbit holes”  
+*Topic: Avoiding reinvention and leveraging existing tools*
+
+**Segment 18: 202s – 212s**  
+Max reflects on his development experience. No visible on-screen text. Spoken: “um but you you're probably a better developer than i am so well i've been white coding for the last year so i don't know if yeah i used to get up for or i've been like working for four years”  
+*Topic: Developer experience and coding style*
+
+**Segment 19: 212s – 224s**  
+Max describes his current approach as “vibe coding.” No visible on-screen text. Spoken: “Yeah, I'm just vibe coding. Yeah. Yeah, me too. Me too. It's whatever I had was gone. So anyway, I need to go talk to more people to see if this can be actually working.”  
+*Topic: Creative workflow and iteration*
+
+**Segment 20: 224s – 234s**  
+Max shares a personal insight: avoid building tools from scratch. No visible on-screen text. Spoken: “So anyway, I need to go talk to more people to see if this can be actually working. We're going to see. Yeah. I do want to see this though. I think it'll be very interesting.”  
+*Topic: Validation and prototyping*
+
+**Segment 21: 234s – 244s**  
+A man confirms the project is functional. No visible on-screen text. Spoken: “Did something happen? You got in. It's functional. I added like a bunch of random skills and references, so it's not like, if it works, it works, then yeah.”  
+*Topic: Project functionality and testing*
+
+**Segment 22: 264s – 274s**  
+The interviewer announces a demo and introduces Mike. No visible on-screen text. Spoken: “I have great news. We came up with a demo and you're currently going to be part of it. I see that you have the meta ray-bans on we're doing something similar”  
+*Topic: Demo integration and wearable tech*
+
+**Segment 23: 274s – 285s**  
+Mike is introduced as a Cornell student studying biomedical engineering. No visible on-screen text. Spoken: “yeah so yeah can I for the sake of the demo what's your name my name is Mike Mike nice to meet you my name is Andrew I'm a third year student at Cornell I'm actually studying biomedical engineering but it's more device related okay”  
+*Topic: Personal background and academic focus*
+
+**Segment 24: 285s – 295s**  
+Mike discusses the medical potential of Meta Ray-Bans. No visible on-screen text. Spoken: “it's actually very interesting those ray-bans I was sent a paper recently where people were using this for check-ins at doctors where they equipped them with with the Ray-Bans and their diagnoses and their checkups were actually much more accurate.”  
+*Topic: Wearable tech in healthcare*
+
+**Segment 25: 295s – 301s**  
+Mike confirms the Ray-Bans are his prescription glasses. No visible on-screen text. Spoken: “They were able to feed it into models that were able to find issues with what was prescribed or what the analysis was. And so it was very, very interesting to see that. So yeah, you're wearing a medical tool right now. Very interesting, yes. Well, that's very exciting. I don't think of it like, well, actually, they are my prescription glasses. Really? Yeah, yeah.”  
+*Topic: Personal use of medical wearables*
+
+**Segment 26: 301s – 311s**  
+Mike reveals he works for AWS. No visible on-screen text. Spoken: “So I work at Kido? Well, I work for AWS. I'm a big fan of Kido. Oh, yeah. I work more on the agent core side of things.”  
+*Topic: Employer and technical focus*
+
+**Segment 27: 311s – 321s**  
+Mike discusses using AWS’s “Strands” agents. No visible on-screen text. Spoken: “Bedrock, agent core, and strands. Oh, yeah. I've actually... Because I was building something earlier this summer, and I was actually using strands agents for it. And it's very, very nice. Very minimal. Oh, awesome to hear.”  
+*Topic: Use of AWS agent frameworks*
+
+**Segment 28: 321s – 332s**  
+Mike praises Strands for being minimal and unobtrusive. No visible on-screen text. Spoken: “Which I think is pretty great. But yeah, actually, it was funny coming here. My uncle works at AWS and I told him and he was like, oh, you're going to the builder's loft. And I was like, yeah, he already knows.”  
+*Topic: Personal connection to AWS and event location*
+
+**Segment 29: 332s – 342s**  
+Mike shares a personal anecdote about his uncle working on chips. No visible on-screen text. Spoken: “But he's in Austin. Oh, okay. Yeah, working more with the chips. Of course. Yeah, exactly. It's very interesting.”  
+*Topic: Family and technical background*
+
+**Segment 30: 342s – 352s**  
+Mike describes his personal AI assistant project. No visible on-screen text. Spoken: “What the heck is that? Yeah, I'm very... interested so not currently recording but it's uh it's my own hacking project that i'm working on so it's an ai assistant um well yeah it's an ai assistant when i press record it can run for hours and hours yeah maybe”  
+*Topic: Personal AI assistant development*
+
+**Segment 31: 352s – 362s**  
+Mike explains his AI assistant streams audio to the cloud for summarization. No visible on-screen text. Spoken: “similar to what you're doing yeah yeah and it basically streams audio conversations up into the cloud and then summarizes meetings for me and action items and research and all that kind of stuff there”  
+*Topic: AI-powered meeting summarization*
+
+**Segment 32: 362s – 372s**  
+Mike discusses the inspiration from VCs needing to remember people. No visible on-screen text. Spoken: “you go yeah yeah yeah there you go but we were so so this is actually something that i like ideated with a few other people because we were talking with uh people in like the vc space because they were like i i have a friend that says he talks to at least 100 people per day when he's actually looking for people and remembering the names and faces can be very annoying”  
+*Topic: Problem-solving for high-volume networking*
+
+**Segment 33: 372s – 382s**  
+Mike compares his tool to existing note-taking apps. No visible on-screen text. Spoken: “and so like yeah and so having the the video aspect of it with the audio yeah yeah i i are you a like granola user or do you use something something similar of like the online note takers um i don't use that particularly um”  
+*Topic: Differentiating from existing tools*
+
+**Segment 34: 382s – 392s**  
+Mike reveals he builds tools for fun and as a developer advocate. No visible on-screen text. Spoken: “i i'm not very sticky with this stuff. I try all kinds of different things. At the moment, a lot of the things that I'm using are things that I've just built for myself. Yeah. I mean, it's easier than ever. Yeah. Yep. And also, it's part of what I do as well. So I'm a developer advocate. So part of what I do is building crazy stuff and just having a whole go with it,”  
+*Topic: Developer advocacy and personal tooling*
+
+**Segment 35: 392s – 403s**  
+Mike confirms he builds tools for other developers. No visible on-screen text. Spoken: “right? Yeah. Do you like a lot of internal tooling for it? I do do some. Well, no. When I'm building stuff like that, it's more like I'm building tooling for developers.”  
+*Topic: Developer-centric tooling*
+
+**Segment 36: 403s – 413s**  
+Mike reflects on his motivation: making things for fun. No visible on-screen text. Spoken: “Yeah, you're just making it for fun. I'm just making it for fun.”  
+*Topic: Passion-driven development*
+
+**Segment 37: 413s – 423s**  
+Mike describes his app that streams video to an AWS agent for real-time tour generation. No visible on-screen text. Spoken: “How's it going to cope with this? It's fine. All the better. This is going to be part of our demo if you're fine with that. I want to prepare the food, so you are the new host. Oh, okay. Excellent. And now I'm the host for the day. Oh, look at that. What an honor. Yeah, yeah, yeah. Well, it's a very important job. What was I saying?”  
+*Topic: Demo integration and role shift*
+
+**Segment 38: 423s – 434s**  
+Mike explains his app uses camera feed to trigger an AWS agent. No visible on-screen text. Spoken: “Yeah, so I hacked on this. Play around with this, right? So I created an app that would basically work. with the camera on here and take the camera feed and then push it into an agent that I've got running up in AWS.”  
+*Topic: Real-time video streaming and agent processing*
+
+**Segment 39: 434s – 444s**  
+Mike describes how the agent generates a personalized tour. No visible on-screen text. Spoken: “And initially it was kind of fun. I saw the data flow. And then I just did a couple more hacks on it until I got to the point where it would stream the video constantly to an agent which is up in the cloud. And then it gave me a personalized tour of wherever I was.”  
+*Topic: Real-time AI-guided navigation*
+
+**Segment 40: 444s – 454s**  
+Mike references a previous hackathon with Bright Data. No visible on-screen text. Spoken: “That I actually, I did a hackathon with Bright Data and we built that. I love that. Before. So we used something called MOSS.”  
+*Topic: Past collaboration and project history*
+
+**Segment 41: 454s – 464s**  
+Mike explains the use of a local vector database for fast retrieval. No visible on-screen text. Spoken: “So what we
