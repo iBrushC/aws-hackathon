@@ -372,10 +372,7 @@ async def ingest_new(index_id: str, source: str) -> int:
     # A local upload has no public URL for playback — pull the HLS URL from TL.
     url = None if is_file else source
     if is_file:
-        try:
-            url = tl.get_video_meta(index_id, video_id).get("url")
-        except Exception:
-            pass
+        url = tl.wait_for_playback_url(index_id, video_id)
     return await _analyze_embed_write(index_id, video_id, url, title, info.get("duration_sec"))
 
 

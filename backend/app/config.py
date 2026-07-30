@@ -74,6 +74,9 @@ class Settings(BaseSettings):
     domain_id: str = "video-context-graph"
     backend_port: int = 8000
     frontend_port: int = 3000
+    # Comma-separated browser origins allowed to call the API. Empty means "just
+    # the Next.js frontend on frontend_port".
+    cors_origins: str = ""
 
     model_config = {"env_file": "../.env", "env_file_encoding": "utf-8", "extra": "ignore"}
 

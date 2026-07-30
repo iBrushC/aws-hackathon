@@ -1,7 +1,6 @@
 """Video Agent Context Graph — FastAPI application."""
 
 import logging
-import os
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
@@ -41,10 +40,16 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-CORS_ORIGINS = os.getenv(
-    "CORS_ORIGINS",
-    f"http://localhost:{settings.frontend_port}",
-).split(",")
+# Read through Settings, not os.getenv: pydantic-settings loads the repo-root
+# .env into the settings object without exporting it to the process
+# environment, so a CORS_ORIGINS line in .env was being silently ignored.
+CORS_ORIGINS = [
+    origin.strip()
+    for origin in (
+        settings.cors_origins or f"http://localhost:{settings.frontend_port}"
+    ).split(",")
+    if origin.strip()
+]
 
 app.add_middleware(
     CORSMiddleware,

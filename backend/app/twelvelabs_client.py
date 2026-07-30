@@ -256,6 +256,30 @@ def ingest_video(index_id: str, *, video_url: str | None = None,
     }
 
 
+def wait_for_playback_url(index_id: str, video_id: str,
+                          attempts: int = 6, delay: float = 5.0) -> str | None:
+    """Poll for a video's HLS playback URL.
+
+    TwelveLabs finishes HLS packaging *after* the indexing task reports "ready",
+    so the URL is usually still empty on the first look. A video stored without
+    it has no thumbnails behind it, which leaves the UI showing placeholders
+    forever, so it is worth waiting a few seconds here.
+    """
+    for attempt in range(attempts):
+        try:
+            url = get_video_meta(index_id, video_id).get("url")
+        except Exception as e:
+            logger.debug("playback URL lookup failed: %s", e)
+            url = None
+        if url:
+            return url
+        if attempt < attempts - 1:
+            time.sleep(delay)
+    logger.warning("No playback URL for %s after %.0fs — the UI will have no "
+                   "frames for it.", video_id, attempts * delay)
+    return None
+
+
 def get_video_meta(index_id: str, video_id: str) -> dict:
     """Fetch metadata for a video already indexed in TwelveLabs.
 
