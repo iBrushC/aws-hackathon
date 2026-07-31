@@ -1,0 +1,8 @@
+C:\Users\magic\Documents\hackathon\aws-hackathon\.codex-video-context-graph-review\HOWTO.md
+C:\Users\magic\Documents\hackathon\aws-hackathon\.codex-video-context-graph-review\README.md
+C:\Users\magic\Documents\hackathon\aws-hackathon\.codex-video-context-graph-review\backend\analysis_4000.txt
+C:\Users\magic\Documents\hackathon\aws-hackathon\.codex-video-context-graph-review\data\_base.yaml
+C:\Users\magic\Documents\hackathon\aws-hackathon\.codex-video-context-graph-review\data\ontology.yaml
+C:\Users\magic\Documents\hackathon\aws-hackathon\.codex-video-context-graph-review\data\videos\ATTRIBUTION.md
+C:\Users\magic\Documents\hackathon\aws-hackathon\.codex-video-context-graph-review\docker-compose.prod.yml
+C:\Users\magic\Documents\hackathon\aws-hackathon\.codex-video-context-graph-review\docker-compose.yml

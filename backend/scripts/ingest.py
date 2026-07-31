@@ -47,7 +47,10 @@ WINDOW_PROMPT = (
     PEGASUS_PROMPT
     + "\n\nYou are being shown only the {start:.0f}s-{end:.0f}s portion of a longer "
     "video. Report every time in seconds on the FULL video's clock, i.e. between "
-    "{start:.0f} and {end:.0f}. Cover the whole portion — do not stop early."
+    "{start:.0f} and {end:.0f}. Cover the whole portion — do not stop early. "
+    "Create a separate time-coded entry whenever the speaker, team, location, "
+    "topic, visible presentation, or primary action changes. Prefer entries of "
+    "roughly 15-45 seconds; never collapse several distinct minutes into one entry."
 )
 
 FUSE_SUMMARY_SYSTEM = (
@@ -64,7 +67,9 @@ STRUCTURE_SYSTEM = (
     '["person","organization","location","object","product","brand","event","concept"]}], '
     '"topics": [str]}]}\n'
     "Canonicalize entity and topic names (Title Case, singular, no duplicates within a segment). "
-    "Use the SAME canonical name for the same real-world thing so it can be merged across videos."
+    "Use the SAME canonical name for the same real-world thing so it can be merged across videos. "
+    "Preserve every distinct time-coded moment from the source analysis as its own segment; do not "
+    "merge different speakers, locations, teams, topics, or actions into a long catch-all segment."
 )
 
 

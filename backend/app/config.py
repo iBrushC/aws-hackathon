@@ -46,7 +46,9 @@ class Settings(BaseSettings):
     # asset id instead of index video id; TwelveLabs returns the same value for
     # both, so no re-upload is involved.
     pegasus_window_model: str = "pegasus1.5"
-    analysis_window_sec: int = 300
+    # Smaller windows keep long recordings from collapsing several minutes of
+    # distinct speakers, teams, and locations into one oversized graph segment.
+    analysis_window_sec: int = 120
     analysis_max_tokens: int = 4096            # hard API ceiling for this model
     analysis_concurrency: int = 3              # windows analyzed in parallel
 

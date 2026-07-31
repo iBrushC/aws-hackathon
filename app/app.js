@@ -1,6 +1,11 @@
+const MANUAL_ACTION_ITEMS = [
+  "Connect Rukaiya with Max",
+  "Schedule a meeting with Kent",
+];
+
 const state = {
   people: [],
-  actionItems: [],
+  actionItems: [...MANUAL_ACTION_ITEMS],
   clips: [],
   chatHistory: [],
   pendingTyping: null,
@@ -51,7 +56,7 @@ async function loadSession() {
       photoFallback: avatarSvg(avatarColor(p.name), p.initials),
     }));
     state.clips = clips.map((c) => ({ ...c, poster: clipPoster("#111827", c.tag) }));
-    state.actionItems = [];
+    state.actionItems = [...MANUAL_ACTION_ITEMS];
     state.live = true;
     renderAll();
   } catch (err) {
@@ -154,6 +159,7 @@ function seedDemoSession() {
   ];
 
   state.actionItems = [
+    ...MANUAL_ACTION_ITEMS,
     "Send Alex the updated build link by tomorrow",
     "Follow up with Sofia about the Northwind intro",
     "Email Priya the resume + availability by Friday",
